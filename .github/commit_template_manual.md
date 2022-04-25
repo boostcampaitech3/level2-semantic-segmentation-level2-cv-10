@@ -4,7 +4,7 @@
 먼저 `git clone` 으로 .gitmessage.txt를 로컬로 불러오세요.
 
 그 후,<br>
-`git config --local commit.template .gitmessage.txt`<br>
+`git config --local commit.template .github/.gitmessage.txt`<br>
 명령어를 통하여 git commit template을 설정하세요.
 
 이후에 commit을 할 때,<br>
