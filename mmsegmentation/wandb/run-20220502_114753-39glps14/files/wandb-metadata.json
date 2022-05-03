@@ -1,0 +1,28 @@
+{
+    "os": "Linux-4.4.0-210-generic-x86_64-with-glibc2.10",
+    "python": "3.8.5",
+    "heartbeatAt": "2022-05-02T11:47:54.938638",
+    "startedAt": "2022-05-02T11:47:53.590469",
+    "docker": null,
+    "gpu": "Tesla V100-PCIE-32GB",
+    "gpu_count": 1,
+    "cpu_count": 8,
+    "cuda": null,
+    "args": [
+        "/opt/ml/input/level2-semantic-segmentation-level2-cv-10/mmsegmentation/configs/_youngwoo_/upernet/upernet_convnext_xlarge_fp16_512x512_50e_custom.py",
+        "--work-dir",
+        "/opt/ml/input/checkpoints/upernet_convnext_xlarge_fp16_512x512_50e_custom"
+    ],
+    "state": "running",
+    "program": "tools/train.py",
+    "codePath": "mmsegmentation/tools/train.py",
+    "git": {
+        "remote": "https://github.com/boostcampaitech3/level2-semantic-segmentation-level2-cv-10.git",
+        "commit": "a3727e45f8ab6eb299e694061ab62c31c2b49486"
+    },
+    "email": "wjsduddn0709@naver.com",
+    "root": "/opt/ml/input/level2-semantic-segmentation-level2-cv-10",
+    "host": "589be1fd2cf5",
+    "username": "root",
+    "executable": "/opt/conda/bin/python"
+}
