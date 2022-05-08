@@ -30,7 +30,97 @@ def np2tmp(array, temp_file_name=None):
     return temp_file_name
 
 
-def single_gpu_test(model, data_loader, show=False, out_dir=None, efficient_test=False):
+def single_gpu_test(model,
+                    data_loader,
+                    show=False,
+                    out_dir=None,
+                    efficient_test=False):
+    """Test with single GPU.
+
+    Args:
+        model (nn.Module): Model to be tested.
+        data_loader (utils.data.Dataloader): Pytorch data loader.
+        show (bool): Whether show results during infernece. Default: False.
+        out_dir (str, optional): If specified, the results will be dumped into
+            the directory to save output results.
+        efficient_test (bool): Whether save the results as local numpy files to
+            save CPU memory during evaluation. Default: False.
+
+    Returns:
+        list: The prediction results.
+    """
+
+    model.eval()
+    results = []
+    dataset = data_loader.dataset
+    prog_bar = mmcv.ProgressBar(len(dataset))
+    for i, data in enumerate(data_loader):
+        # -- add (for type error)
+        for i in range(len(data['img'])):
+            data['img'][i] = data['img'][i].half()
+        # --
+        
+        with torch.no_grad():
+            result, ft_maps, seg_maps = model(return_loss=False, **data)
+
+        if show or out_dir:
+            if i % 10 == 0:
+                img_tensor = data['img'][0]
+                img_metas = data['img_metas'][0].data[0]
+                imgs = tensor2imgs(img_tensor, **img_metas[0]['img_norm_cfg'])
+                assert len(imgs) == len(img_metas)
+
+                for img, img_meta in zip(imgs, img_metas):
+                    h, w, _ = img_meta['img_shape']
+                    img_show = img[:h, :w, :]
+
+                    ori_h, ori_w = img_meta['ori_shape'][:-1]
+                    img_show = mmcv.imresize(img_show, (ori_w // 4, ori_h // 4))
+
+                    if out_dir:
+                        out_file = osp.join(out_dir, str(i) + '_' + img_meta['ori_filename'])
+                    else:
+                        out_file = None
+
+                    model.module.show_result(
+                        i,
+                        img_show,
+                        result,
+                        palette=dataset.PALETTE,
+                        show=show,
+                        out_file=(out_dir, img_meta['filename']))
+
+                    
+                    # if i % 80 == 0:
+                    #     model.module.save_maps(
+                    #         i,
+                    #         ft_maps,
+                    #         seg_maps,
+                    #         out_dir
+                    #     )
+
+        if isinstance(result, list):
+            if efficient_test:
+                result = [np2tmp(_) for _ in result]
+            results.extend(result)
+        else:
+            if efficient_test:
+                result = np2tmp(result)
+            results.append(result)
+
+        batch_size = data['img'][0].size(0)
+        for _ in range(batch_size):
+            prog_bar.update()
+        
+    return results
+
+
+# -- add
+def single_gpu_test_inf(model,
+                    data_loader,
+                    show=False,
+                    out_dir=None,
+                    efficient_test=False):
     """Test with single GPU.
 
     Args:
@@ -50,40 +140,38 @@ def single_gpu_test(model, data_loader, show=False, out_dir=None, efficient_test
     results = []
     # -- add (for sorting)
     file_names = []
-    # --
+    #
     dataset = data_loader.dataset
     prog_bar = mmcv.ProgressBar(len(dataset))
     for i, data in enumerate(data_loader):
         # -- add (for type error)
-        for i in range(len(data["img"])):
-            data["img"][i] = data["img"][i].half()
+        for i in range(len(data['img'])):
+            data['img'][i] = data['img'][i].half()
         # --
         # -- add (for sorting)
-        for meta in data["img_metas"][0].data[0]:
-            file_names.append(meta["ori_filename"])
+        for meta in data['img_metas'][0].data[0]:
+            file_names.append(meta['ori_filename'])
         # --
-
+        
         with torch.no_grad():
             result, ft_maps, seg_maps = model(return_loss=False, **data)
 
         if show or out_dir:
             if i % 10 == 0:
-                img_tensor = data["img"][0]
-                img_metas = data["img_metas"][0].data[0]
-                imgs = tensor2imgs(img_tensor, **img_metas[0]["img_norm_cfg"])
+                img_tensor = data['img'][0]
+                img_metas = data['img_metas'][0].data[0]
+                imgs = tensor2imgs(img_tensor, **img_metas[0]['img_norm_cfg'])
                 assert len(imgs) == len(img_metas)
 
                 for img, img_meta in zip(imgs, img_metas):
-                    h, w, _ = img_meta["img_shape"]
+                    h, w, _ = img_meta['img_shape']
                     img_show = img[:h, :w, :]
 
-                    ori_h, ori_w = img_meta["ori_shape"][:-1]
+                    ori_h, ori_w = img_meta['ori_shape'][:-1]
                     img_show = mmcv.imresize(img_show, (ori_w // 4, ori_h // 4))
 
                     if out_dir:
-                        out_file = osp.join(
-                            out_dir, str(i) + "_" + img_meta["ori_filename"]
-                        )
+                        out_file = osp.join(out_dir, str(i) + '_' + img_meta['ori_filename'])
                     else:
                         out_file = None
 
@@ -93,9 +181,9 @@ def single_gpu_test(model, data_loader, show=False, out_dir=None, efficient_test
                         result,
                         palette=dataset.PALETTE,
                         show=show,
-                        out_file=(out_dir, img_meta["filename"]),
-                    )
+                        out_file=(out_dir, img_meta['filename']))
 
+                    
                     # if i % 80 == 0:
                     #     model.module.save_maps(
                     #         i,
@@ -113,16 +201,17 @@ def single_gpu_test(model, data_loader, show=False, out_dir=None, efficient_test
                 result = np2tmp(result)
             results.append(result)
 
-        batch_size = data["img"][0].size(0)
+        batch_size = data['img'][0].size(0)
         for _ in range(batch_size):
             prog_bar.update()
-
+        
         # -- add (for sorting)
         file_names_sorted = np.sort(file_names)
         file_names_sorted_idx = np.argsort(file_names)
         results_sorted = [results[i] for i in file_names_sorted_idx]
         # --
     return results_sorted
+# --
 
 
 def multi_gpu_test(
