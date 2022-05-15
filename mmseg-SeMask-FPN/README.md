@@ -2,9 +2,10 @@
 
 > **SeMask: Semantically Masked Transformers for Semantic Segmentation**의 원본 repository는 [링크](https://github.com/Picsart-AI-Research/SeMask-Segmentation/tree/main/SeMask-FPN)를 통해 확인할 수 있습니다.
 
+<br>
+
 ![semask_fpn](https://user-images.githubusercontent.com/43572543/168481766-14142dfe-3229-418f-a15a-b2821093fe13.svg)
 
-<br>
 
 ## Contents
 
@@ -47,12 +48,13 @@
 1. `configs` 디렉토리 내부에 자신의 이름으로 된 디렉토리를 만듭니다. (ex. `_snowman_`) 실험에 사용할 config 파일들은 해당 디렉토리 밑에 작성하면 됩니다.
 2. `mmseg-SeMask-FPN/pretrain` 디렉토리를 생성하고, 그 밑에 원본 pretrained Swin-L 모델을 다운받습니다.
    
+   > 기존의 `mmsegmentation`에서 pretrained Swin-L 모델을 사용할 때는 `tools/model_converters/swin2mmseg.py`를 이용하여 모델을 변환해야 했으나, `mmseg-SeMask-FPN`에서는 원본 모델을 사용하시면 됩니다.
+
    ```bash
    mkdir pretrain
 
    wget https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22k.pth
    ```
-   > 기존의 `mmsegmentation`에서 pretrained Swin-L 모델을 사용할 때는 `tools/model_converters/swin2mmseg.py`를 이용하여 모델을 변환해야 했으나, `mmseg-SeMask-FPN`에서는 원본 모델을 사용하시면 됩니다. 
 3. `mmsegmentation`과 동일하게 다음의 명령어로 학습을 수행할 수 있습니다.
    
    ```bash
