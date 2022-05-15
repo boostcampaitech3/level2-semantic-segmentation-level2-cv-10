@@ -2,6 +2,8 @@
 
 > **SeMask: Semantically Masked Transformers for Semantic Segmentation**의 원본 repository는 [링크](https://github.com/Picsart-AI-Research/SeMask-Segmentation/tree/main/SeMask-FPN)를 통해 확인할 수 있습니다.
 
+![semask_fpn](https://user-images.githubusercontent.com/43572543/168481766-14142dfe-3229-418f-a15a-b2821093fe13.svg)
+
 <br>
 
 ## Contents
