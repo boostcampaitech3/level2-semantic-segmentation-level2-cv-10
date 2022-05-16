@@ -1,105 +1,93 @@
 # SeMask FPN
 
+> **SeMask: Semantically Masked Transformers for Semantic Segmentation**의 원본 repository는 [링크](https://github.com/Picsart-AI-Research/SeMask-Segmentation/tree/main/SeMask-FPN)를 통해 확인할 수 있습니다.
 
-This repo contains the code for our paper **SeMask: Semantically Masked Transformers for Semantic Segmentation**. It is based on [mmsegmentaion](https://github.com/open-mmlab/mmsegmentation/tree/v0.11.0).
+<br>
 
-<img src="docs/semask_fpn.svg" alt='semask' height='600px'>
+![semask_fpn](https://user-images.githubusercontent.com/43572543/168481766-14142dfe-3229-418f-a15a-b2821093fe13.svg)
+
 
 ## Contents
-1. [Results](#1-results)
-2. [Setup Instructions](#2-setup-instructions)
-3. [Demo](3-demo)
-4. [Citing SeMask](#4-citing-semask)
 
-## 1. Results
+  - [Installation](#installation)
+  - [Train](#train)
+  - [Inference](#inference)
+  - [Troubleshooting](#troubleshooting)
+    - [Resolved Problems](#resolved-problems)
+    - [Remaining Problems](#remaining-problems)
+  - [Citing SeMask](#citing-semask)
 
-- &dagger; denotes the backbones were pretrained on ImageNet-22k and 384x384 resolution images.
-- Pre-trained models can be downloaded from [Swin Transformer for ImageNet Classification](https://github.com/microsoft/Swin-Transformer).
-- Access code for `baidu` is `swin`.
+<br>
 
-### ADE20K
+## Installation
 
-| Method | Backbone | Crop Size | mIoU | mIoU (ms+flip) | #params | config | Checkpoint |
-|   :---:| :---:    | :---:     | :---:| :---:          | :---:   | :---:  |    :---:   |
-| SeMask-T FPN | SeMask Swin-T | 512x512 | 42.06  | 43.36 | 35M | [config](configs/semask_swin/ade20k/semfpn_semask_swin_tiny_patch4_window7_512x512_80k_ade20k.py) | [checkpoint](https://drive.google.com/file/d/1L0daUHWQGNGCXHF-cKWEauPSyBV0GLOR/view?usp=sharing) |
-| SeMask-S FPN | SeMask Swin-S | 512x512 | 45.92  | 47.63 | 56M | [config](configs/semask_swin/ade20k/semfpn_semask_swin_small_patch4_window7_512x512_80k_ade20k.py) | [checkpoint](https://drive.google.com/file/d/1QhDG4SyGFtWL5kP9BbBoyPqTuFu7fH_y/view?usp=sharing) |
-| SeMask-B FPN | SeMask Swin-B<sup>&dagger;</sup> | 512x512 | 49.35  | 50.98 | 96M | [config](configs/semask_swin/ade20k/semfpn_semask_swin_base_patch4_window12_512x512_80k_ade20k.py) | [checkpoint](https://drive.google.com/file/d/1PXCEhrrUy5TJC4dUp7YDQvaapnMzGT6C/view?usp=sharing) |
-| SeMask-L FPN | SeMask Swin-L<sup>&dagger;</sup> | 640x640 | 51.89  | 53.52 | 211M| [config](configs/semask_swin/ade20k/semfpn_semask_swin_large_patch4_window12_640x640_80k_ade20k.py) | [checkpoint](https://drive.google.com/file/d/1u5flfAQCiQJbMZbZPIlGUGTYBz9Ca7rE/view?usp=sharing) |
+1. 기존의 `mmsegmentation`과 환경이 꼬이지 않도록 새로운 가상환경 `semask`를 생성합니다. 
+   
+   ```bash
+   conda create -n semask python=3.7 -y
+   
+   source activate semask
+   ```
+2. 호환되는 버전의 `pytorch`, `torchvision`, `cudatoolkit`, `mmcv`를 설치합니다.
+   
+   ```bash
+   conda install pytorch=1.6.0 torchvision cudatoolkit=10.1 -c pytorch
 
+   pip install mmcv-full==1.3.0 -f https://download.openmmlab.com/mmcv/dist/cu101/torch1.6.0/index.html
 
-### Cityscapes
+   cd input/code/mmseg-SeMask-FPN # 코드가 위치한 경로로 이동
 
-| Method | Backbone | Crop Size | mIoU | mIoU (ms+flip) | #params | config | Checkpoint |
-|   :---:| :---:    | :---:     | :---:| :---:          | :---:   | :---:  |    :---:   |
-| SeMask-T FPN | SeMask Swin-T | 768x768 | 74.92  | 76.56 | 34M | [config](configs/semask_swin/cityscapes/semfpn_semask_swin_tiny_patch4_window7_768x768_80k_cityscapes.py) | [checkpoint](https://drive.google.com/file/d/1_JBOJQSUVes-CWs075XyPnuNfG5psELr/view?usp=sharing) |
-| SeMask-S FPN | SeMask Swin-S | 768x768 | 77.13  | 79.14 | 56M | [config](configs/semask_swin/cityscapes/semfpn_semask_swin_small_patch4_window7_768x768_80k_cityscapes.py) | [checkpoint](https://drive.google.com/file/d/1WyT207dZmdwETBUR6aeiqOVfQdUIV_fN/view?usp=sharing) |
-| SeMask-B FPN | SeMask Swin-B<sup>&dagger;</sup> | 768x768 | 77.70  | 79.73 | 96M | [config](configs/semask_swin/cityscapes/semfpn_semask_swin_base_patch4_window12_768x768_80k_cityscapes.py) | [checkpoint](https://drive.google.com/file/d/1-LzVB6XzD7IR0zzE5qmE0EM4ZTv429b4/view?usp=sharing) |
-| SeMask-L FPN | SeMask Swin-L<sup>&dagger;</sup> | 768x768 | 78.53  | 80.39 | 211M| [config](configs/semask_swin/cityscapes/semfpn_semask_swin_large_patch4_window12_768x768_80k_cityscapes.py) | [checkpoint](https://drive.google.com/file/d/1R9DDCmucQ_a_6ZkMGufEZCzJ-_qVMqCB/view?usp=sharing) |
+   pip install -e .  # or "python setup.py develop"
+   ```
+3. 앞으로 SeMask를 이용할 때는 해당 가상환경 하에서 이용합니다.
 
-### COCO-Stuff 10k
+<br>
 
-| Method | Backbone | Crop Size | mIoU | mIoU (ms+flip) | #params | config | Checkpoint |
-|   :---:| :---:    | :---:     | :---:| :---:          | :---:   | :---:  |    :---:   |
-| SeMask-T FPN | SeMask Swin-T | 512x512 | 37.53  | 38.88 | 35M | [config](configs/semask_swin/coco_stuff10k/semfpn_semask_swin_tiny_patch4_window7_512x512_80k_coco10k.py) | [checkpoint](https://drive.google.com/file/d/1qhXsJ8H64JPI_DW7CNzhxpHSEG2sKaIl/view?usp=sharing) |
-| SeMask-S FPN | SeMask Swin-S | 512x512 | 40.72  | 42.27 | 56M | [config](configs/semask_swin/coco_stuff10k/semfpn_semask_swin_small_patch4_window7_512x512_80k_coco10k.py) | [checkpoint](https://drive.google.com/file/d/1ddXSMQu5ClkbLNMyQdyT0ATaOr86vIkL/view?usp=sharing) |
-| SeMask-B FPN | SeMask Swin-B<sup>&dagger;</sup> | 512x512 | 44.63  | 46.30 | 96M | [config](configs/semask_swin/coco_stuff10k/semfpn_semask_swin_base_patch4_window12_512x512_80k_coco10k.py) | [checkpoint](https://drive.google.com/file/d/1pGWI7U9bZJoe4ZaDx7ktWELx-uVN7rL0/view?usp=sharing) |
-| SeMask-L FPN | SeMask Swin-L<sup>&dagger;</sup> | 640x640 | 47.47  | 48.54 | 211M| [config](configs/semask_swin/coco_stuff10k/semfpn_semask_swin_large_patch4_window12_640x640_80k_coco10k.py) | [checkpoint](https://drive.google.com/file/d/1F6B9x9pX-SYEth7hdtxeNUeQ3XncOH7G/view?usp=sharing) |
+## Train
 
-## 2. Setup Instructions
+1. `configs` 디렉토리 내부에 자신의 이름으로 된 디렉토리를 만듭니다. (ex. `_snowman_`) 실험에 사용할 config 파일들은 해당 디렉토리 밑에 작성하면 됩니다.
+2. `mmseg-SeMask-FPN/pretrain` 디렉토리를 생성하고, 그 밑에 원본 pretrained Swin-L 모델을 다운받습니다.
+   
+   > 기존의 `mmsegmentation`에서 pretrained Swin-L 모델을 사용할 때는 `tools/model_converters/swin2mmseg.py`를 이용하여 모델을 변환해야 했으나, `mmseg-SeMask-FPN`에서는 원본 모델을 사용하시면 됩니다.
 
-### Installation
+   ```bash
+   mkdir pretrain
 
-- We developed the codebase using [Pytorch v1.8.0](https://pytorch.org/get-started/locally/) and python 3.7.
-- Please refer to [get_started.md](docs/get_started.md#installation) for installation and [dataset_prepare.md](docs/dataset_prepare.md#prepare-datasets) for dataset preparation.
-- **Note**: Change the paths according to the dataset location in the [dataset config files](configs/_base_/datasets/semask/).
+   wget https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_large_patch4_window12_384_22k.pth
+   ```
+3. `mmsegmentation`과 동일하게 다음의 명령어로 학습을 수행할 수 있습니다.
+   
+   ```bash
+   python tools/train.py [config-file-path] [--seed]
+   ```
 
-### Inference
-```
-# single-gpu testing
-python tools/test.py <CONFIG_FILE> <SEG_CHECKPOINT_FILE> --eval mIoU
+<br>
 
-# multi-gpu testing
-tools/dist_test.sh <CONFIG_FILE> <SEG_CHECKPOINT_FILE> <GPU_NUM> --eval mIoU
+## Inference
 
-# multi-gpu, multi-scale testing
-tools/dist_test.sh <CONFIG_FILE> <SEG_CHECKPOINT_FILE> <GPU_NUM> --aug-test --eval mIoU
-```
+1. jupyter lab의 커널에 `semask` 가상 환경을 추가합니다.
+   
+   ```bash
+   python -m ipykernel install --user --display-name semask --name semask
+   ```
+2. jupyter lab에서 `inference.ipynb`를 열고, 1번에서 추가한 커널 `semask`로 변경합니다.
+3. 차례대로 실행하면 됩니다. 이때, import 오류가 발생한다면 직접 `pip install` 해주시면 됩니다.
 
-### Training
+<br>
 
-To train with pre-trained models, run:
-```
-# single-gpu training
-python tools/train.py <CONFIG_FILE> --options model.pretrained=<PRETRAIN_MODEL> [model.backbone.use_checkpoint=True] [other optional arguments]
+## Troubleshooting
 
-# multi-gpu training
-tools/dist_train.sh <CONFIG_FILE> <GPU_NUM> --options model.pretrained=<PRETRAIN_MODEL> [model.backbone.use_checkpoint=True] [other optional arguments] 
-```
+### Resolved Problems
+- [X] `Float`, `Half`와 관련된 type error
+- [X] inference 시, dataset에 `shuffle=False`로 주었음에도 불구하고 shuffle이 되는 현상
 
-For example, to train an Semantic-FPN model with a `SeMask Swin-T` backbone and 8 gpus, run:
-```
-tools/dist_train.sh configs/semask_swin/cityscapes/semfpn_semask_swin_tiny_patch4_window7_768x768_80k_cityscapes.py 8 --options model.pretrained=<PRETRAIN_MODEL> 
-```
+### Remaining Problems
+- [ ] 각 class에 대한 validation 결과가 `wandb`에 기록되지 않는 현상
+- [ ] `save_best`가 동작하지 않는 현상
 
-**Notes:** 
-- `use_checkpoint` is used to save GPU memory. Please refer to [this page](https://pytorch.org/docs/stable/checkpoint.html) for more details.
-- The default learning rate and training schedule are as follows:
-  - `ADE20K`: 2 GPUs and 8 imgs/gpu. For **Large** variant, we use 4 GPUs with 4 imgs/gpu.
-  - `Cityscapes`: 2 GPUs and 4 imgs/gpu. For **Large** variant, we use 4 GPUs with 2 imgs/gpu.
-  - `COCO-Stuff 10k`: 4 GPUs and 4 imgs/gpu. For **Base** and **Large** variant, we use 8 GPUs with 2 imgs/gpu.
+<br>
 
-
-## 3. Demo
-
-To save the predictions, run the following command:
-
-```
-python tools/test.py <CONFIG_FILE> <SEG_CHECKPOINT_FILE> --eval mIoU --show-dir visuals
-```
-
-<img src="docs/demo.svg" alt='demo' height='600px'>
-
-## 4. Citing SeMask
+## Citing SeMask
 
 ```BibTeX
 @article{jain2021semask,
