@@ -1,5 +1,5 @@
 # [Lv2 P-Stage] Semantic Segmentation / #눈#사람
-> 📑 Wrapup Report 보러가기 [>> PDF]()
+> 📑 Wrapup Report [▶︎ PDF](https://github.com/boostcampaitech3/level2-semantic-segmentation-level2-cv-10/blob/master/Semantic%20Segmentation_CV_%E1%84%90%E1%85%B5%E1%86%B7%20%E1%84%85%E1%85%B5%E1%84%91%E1%85%A9%E1%84%90%E1%85%B3(10%E1%84%8C%E1%85%A9).pdf)
 
 ## Members
 | 김하준 | 송민수 | 심준교 | 유승리 | 이창진 | 전영우 |
@@ -56,6 +56,8 @@ Test set의 mIoU(Mean Intersection over Union)
 [>> Lawin Transformer 추가](https://github.com/boostcampaitech3/level2-semantic-segmentation-level2-cv-10/tree/master/mmsegmentation/mmseg/models)
 
 ### SeMask-FPN
+> 실행 방법은 `README.md` 참고
+
 [>> mmseg-SeMask-FPN 폴더](https://github.com/boostcampaitech3/level2-semantic-segmentation-level2-cv-10/tree/master/mmseg-SeMask-FPN)
 
 <br>
