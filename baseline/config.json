@@ -1,0 +1,71 @@
+{
+    "project_name": "PStage3",
+    "device": "cuda",
+    "n_gpu": 1,
+    "run_id": "deeplabv3_tu-swinnet50ts_256_v1",
+    "n_class": 11,
+
+    "model": {
+        "decoder": "DeepLabV3",
+        "args": {
+            "encoder_name": "timm-efficientnet-b7",
+            "encoder_weights": "noisy-student",
+            "in_channels": 3,
+            "classes": 11
+        }
+    },
+
+    "train_loader":{
+        "type": "COCOSegDataLoader",
+        "args": {
+            "data_dir": "../data",
+            "json_path": "../data/train_new.json",
+            "mode": "train",
+            "batch_size": 2,
+            "shuffle": true,
+            "drop_last": true,
+            "num_workers": 2
+        }
+    },
+
+    "val_loader":{
+        "type": "COCOSegDataLoader",
+        "args": {
+            "data_dir": "../data",
+            "json_path": "../data/val.json",
+            "mode": "val",
+            "batch_size": 16,
+            "shuffle": true,
+            "drop_last": false,
+            "num_workers": 2
+        }
+    },
+
+    "optimizer": {
+        "type": "Adam",
+        "args": {
+            "lr": 0.002,
+            "weight_decay": 0.00001,
+            "amsgrad": true
+        }
+    },
+
+    "loss": "cross_entropy_loss",
+
+    "metrics": ["segmentation_metrics"],
+
+    "lr_scheduler": {
+        "type": "StepLR",
+        "args": {
+            "step_size": 5,
+            "gamma": 0.3
+        }
+    },
+
+    "trainer": {
+        "epochs": 50,
+        "save_dir": "saved/",
+        "save_period": 1,
+        "verbosity": 2
+    }
+}
